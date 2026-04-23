@@ -12,6 +12,7 @@
   "dependencies": {
     "lucide-react": "^1.7.0",
     "react": "^19.2.4",
+    "react-async": "^10.0.1",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {

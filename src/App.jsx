@@ -12,8 +12,9 @@ export default function PremiumTodo() {
   const [showDeleteModal, setShowDeleteModal] = useState({ show: false, id: null });
   const [filter, setFilter] = useState('All');
   
-  // WEEK 6: UI Loading State for Asynchronous actions
+  // WEEK 6: UI Loading States for Asynchronous actions
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true); // <-- Added for strict page load spinner
 
   useEffect(() => {
     if (showAddModal && taskInputRef.current) {
@@ -23,13 +24,14 @@ export default function PremiumTodo() {
 
   // WEEK 6: PROMISES, ASYNC AWAIT, & JSON (Fetching Initial Data)
   useEffect(() => {
-    if (tasks.length === 0) {
-      const fetchInitial = async () => {
-        setIsSyncing(true);
-        try {
-          // ARTIFICIAL DELAY: Pauses execution for 1.5 seconds to demonstrate the pending Promise state during presentation
-          await new Promise(resolve => setTimeout(resolve, 1500));
+    const fetchInitial = async () => {
+      setIsPageLoading(true); // Force the loading screen on
+      
+      // ARTIFICIAL DELAY: Forces the spinner to show for 1.5s on every refresh
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
+      if (tasks.length === 0) {
+        try {
           // fetch() returns a PROMISE. 'await' pauses execution until it resolves.
           const res = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=3');
           // JSON: Parsing the JSON string response into JavaScript objects
@@ -42,12 +44,12 @@ export default function PremiumTodo() {
           setTasks(formatted);
         } catch (e) { 
           console.error("Async Error:", e); 
-        } finally { 
-          setIsSyncing(false); 
         }
-      };
-      fetchInitial();
-    }
+      }
+      setIsPageLoading(false); // Turn the loading screen off
+    };
+    
+    fetchInitial();
   }, []);
 
   // WEEK 6: FORM DATA, ASYNC AWAIT, PROMISES, & JSON (Adding a Task)
@@ -191,7 +193,7 @@ export default function PremiumTodo() {
 
         {/* TASK LIST */}
         <div className="grid gap-5">
-          {isSyncing && tasks.length === 0 ? (
+          {isPageLoading ? (
              <div className="text-center py-20 font-bold opacity-50 text-2xl tracking-widest uppercase flex flex-col items-center gap-4">
                <Loader2 size={40} className="animate-spin text-indigo-500" />
                Awaiting Promise Resolution...

@@ -1,28 +1,31 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-// 1. Create the Context (This is the "bucket" that holds the data)
+// 1. Create the Context
 export const ThemeContext = createContext();
 
-// 2. Create the Provider (This wraps around our app and gives access to the bucket)
+// 2. Create the Provider
 export function ThemeProvider({ children }) {
-  // We initialize the theme by checking localStorage first. If nothing is there, default to true (Dark Mode)
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem('ultra-theme-v7');
-    return savedTheme !== null ? JSON.parse(savedTheme) : true;
+  // Initialize theme from localStorage, default to 'midnight' if empty
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('priority-theme-v9');
+    return savedTheme || 'midnight';
   });
 
-  // Whenever the theme changes, save it to localStorage
+  // Persist theme choice whenever it changes
   useEffect(() => {
-    localStorage.setItem('ultra-theme-v7', JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
+    localStorage.setItem('priority-theme-v9', theme);
+  }, [theme]);
 
-  // The function to toggle the theme
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => !prevMode);
+  // Updated function to handle multiple theme strings
+  const toggleTheme = (newTheme) => {
+    setTheme(newTheme);
   };
 
+  // Check if we are in a "dark" variant (for MUI and specific global styles)
+  const isDarkMode = theme !== 'slate';
+
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, isDarkMode, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

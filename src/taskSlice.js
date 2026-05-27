@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// 1. ASYNC THUNK (Mocking an API Call with Professional Data + Priority)
+// 1. ASYNC THUNK: Mocking the professional task fetch
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (_, { getState }) => {
@@ -10,7 +10,6 @@ export const fetchTasks = createAsyncThunk(
     // Artificial delay for presentation (Simulating network latency)
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Updated with Priority field for Week 8 MUI integration
     const professionalTasks = [
       { id: 101, title: "Review Q3 Marketing Strategy", completed: false, priority: "High" },
       { id: 102, title: "Deploy Redux Architecture Update", completed: true, priority: "Medium" },
@@ -24,38 +23,46 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
-// 2. THE SLICE (The Department)
+// 2. THE SLICE
 const taskSlice = createSlice({
   name: 'tasks',
-  // Initial state pulled from local storage (Updated key to v8)
   initialState: {
-    tasks: JSON.parse(localStorage.getItem('ultra-tasks-v8')) || [],
+    // Persistent tasks (updated to v9)
+    tasks: JSON.parse(localStorage.getItem('ultra-tasks-v9')) || [],
+    
+    // NEW: Career Milestones Tracking Data
+    milestones: [
+      { week: 1, title: "HTML/CSS Foundations", status: "Completed" },
+      { week: 4, title: "React Props & Hooks", status: "Completed" },
+      { week: 6, title: "Async React & Promises", status: "Completed" },
+      { week: 7, title: "Redux State Management", status: "Completed" },
+      { week: 8, title: "MUI & Enterprise Design", status: "In Progress" },
+    ],
+    
     isLoading: false,
     isSyncing: false,
     error: null
   },
-  // SYNCHRONOUS ACTIONS
   reducers: {
     addTask: (state, action) => {
       state.tasks.unshift(action.payload);
-      localStorage.setItem('ultra-tasks-v8', JSON.stringify(state.tasks));
+      localStorage.setItem('ultra-tasks-v9', JSON.stringify(state.tasks));
     },
     toggleTask: (state, action) => {
       const task = state.tasks.find(t => t.id === action.payload);
       if (task) {
         task.completed = !task.completed;
-        localStorage.setItem('ultra-tasks-v8', JSON.stringify(state.tasks));
+        localStorage.setItem('ultra-tasks-v9', JSON.stringify(state.tasks));
       }
     },
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter(t => t.id !== action.payload);
-      localStorage.setItem('ultra-tasks-v8', JSON.stringify(state.tasks));
+      localStorage.setItem('ultra-tasks-v9', JSON.stringify(state.tasks));
     },
     setSyncing: (state, action) => {
       state.isSyncing = action.payload;
     }
   },
-  // ASYNC ACTIONS
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -65,7 +72,7 @@ const taskSlice = createSlice({
         state.isLoading = false;
         if(action.payload !== state.tasks) {
            state.tasks = action.payload;
-           localStorage.setItem('ultra-tasks-v8', JSON.stringify(state.tasks));
+           localStorage.setItem('ultra-tasks-v9', JSON.stringify(state.tasks));
         }
       })
       .addCase(fetchTasks.rejected, (state, action) => {
